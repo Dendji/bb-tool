@@ -33,7 +33,6 @@ export class BoundingBox extends Component {
             start[1]} l ${lastCoord} 0 z`}
           style={{
             stroke: '#FEE140',
-            // stroke: '#000',
             fill: 'url(#Gradient)',
             backgroundColor: '#8EC5FC',
             fillOpacity: '0.6',
@@ -47,64 +46,64 @@ export class BoundingBox extends Component {
 
         <g>
           {!isNew && this.renderDeleteButton(start, end)}
-          {this.renderResizers(start, end)}
+          {!isNew && this.renderResizers(start, end)}
         </g>
       </g>
     );
   }
 
-  renderResizers = (start, end) => (
-    <>
-      <rect
-        x={start[0]}
-        y={start[1] - 10}
-        width={end[0] - start[0]}
-        height='20'
-        style={{
-          fill: 'rgba(0,0,0,0)',
-          strokeWidth: 5,
-          cursor: 'n-resize'
-        }}
-        onMouseDown={e => this.startResize(e, 'top')}
-      />
-      <rect
-        x={end[0] - 10}
-        y={start[1]}
-        width='20'
-        height={end[1] - start[1]}
-        style={{
-          fill: 'rgba(0,0,0,0)',
-          strokeWidth: 5,
-          cursor: 'e-resize'
-        }}
-        onMouseDown={e => this.startResize(e, 'right')}
-      />
-      <rect
-        x={start[0]}
-        y={end[1] - 10}
-        width={end[0] - start[0]}
-        height='20'
-        style={{
-          fill: 'rgba(0,0,0,0)',
-          strokeWidth: 5,
-          cursor: 's-resize'
-        }}
-        onMouseDown={e => this.startResize(e, 'bottom')}
-      />
-      <rect
-        x={start[0] - 10}
-        y={start[1]}
-        width='20'
-        height={end[1] - start[1]}
-        style={{
-          fill: 'rgba(0,0,0,0)',
-          strokeWidth: 5,
-          cursor: 'w-resize'
-        }}
-        onMouseDown={e => this.startResize(e, 'left')}
-      />
-    </>
-  );
+  renderResizers = (start, end) => {
+    const areaSize = 20;
+
+    return (
+      <>
+        <rect
+          x={start[0]}
+          y={start[1] - 10}
+          width={end[0] - start[0]}
+          height={areaSize}
+          fill={'rgba(0,0,0,0)'}
+          style={{
+            cursor: 'n-resize'
+          }}
+          onMouseDown={e => this.startResize(e, 'top')}
+        />
+        <rect
+          x={end[0] - 10}
+          y={start[1]}
+          width={areaSize}
+          height={end[1] - start[1]}
+          fill={'rgba(0,0,0,0)'}
+          style={{
+            cursor: 'e-resize'
+          }}
+          onMouseDown={e => this.startResize(e, 'right')}
+        />
+        <rect
+          x={start[0]}
+          y={end[1] - 10}
+          width={end[0] - start[0]}
+          height={areaSize}
+          fill={'rgba(0,0,0,0)'}
+          style={{
+            cursor: 's-resize'
+          }}
+          onMouseDown={e => this.startResize(e, 'bottom')}
+        />
+        <rect
+          x={start[0] - 10}
+          y={start[1]}
+          width={areaSize}
+          fill={'rgba(0,0,0,0)'}
+          height={end[1] - start[1]}
+          style={{
+            cursor: 'w-resize'
+          }}
+          onMouseDown={e => this.startResize(e, 'left')}
+        />
+      </>
+    );
+  };
 
   renderDeleteButton = (start, end) => (
     <text

@@ -5,22 +5,7 @@ import { BoundingBox } from '../BoundingBox/BoundingBox';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 
-// task https://jsfiddle.net/vaoucptg/
-// simple http://jsfiddle.net/d9BPz/546/
-// https://medium.com/the-z/making-a-resizable-div-in-js-is-not-easy-as-you-think-bda19a1bc53d
-
-// recent
-// https://stackoverflow.com/questions/44748197/calculating-svgRef-bounding-rects-with-react
-// https://engineering.datorama.com/mastering-drag-drop-using-reactjs-hooks-fb58dc1f816f
-// https://engineering.datorama.com/mastering-drag-drop-with-reactjs-part-01-39bed3d40a03
-// http://xahlee.info/js/svg_path_spec.html
-
-// https://try.handl.ai/bounding-rects
-
-/* Баги
-1. нельзя увеличить размер за правый верхний край
-2. при переходе из одной плоскости в другую по диагонали точка начала смещается
-*/
+const minimalRectSize = 50;
 
 class Segmentation extends React.Component {
   static propTypes = {
@@ -28,7 +13,7 @@ class Segmentation extends React.Component {
     imageUrl: PropTypes.string.isRequired
   };
 
-  minimalRectSize = 50;
+  // using when width or height are less than this
 
   constructor(props) {
     super(props);
@@ -96,16 +81,14 @@ class Segmentation extends React.Component {
     });
   };
 
-  scaleAdjusted = rects => {
+  getScaleAdjustedRects = rects => {
     const coeff = this.getScaleCoefficient();
 
-    return rects.map(rect => {
-      return {
-        ...rect,
-        start: rect.start.map(c => c * coeff),
-        end: rect.end.map(c => c * coeff)
-      };
-    });
+    return rects.map(rect => ({
+      ...rect,
+      start: rect.start.map(c => c * coeff),
+      end: rect.end.map(c => c * coeff)
+    }));
   };
 
   getScaleCoefficient = () => {
@@ -116,7 +99,9 @@ class Segmentation extends React.Component {
 
   render() {
     const { rects } = this.state;
-    const adjusted = this.svgRef.current ? this.scaleAdjusted(rects) : rects;
+    const adjusted = this.svgRef.current
+      ? this.getScaleAdjustedRects(rects)
+      : rects;
     return (
       <div>
         <svg
@@ -171,13 +156,13 @@ class Segmentation extends React.Component {
 
   setRectMinimalSize = rect => {
     const { start, end } = rect;
-    console.log(`⚡️: Segmentation -> start, end`, start, end);
-    if (Math.abs(start[0] - end[0]) < this.minimalRectSize) {
-      end[0] = start[0] + this.minimalRectSize;
+
+    if (Math.abs(start[0] - end[0]) < minimalRectSize) {
+      end[0] = start[0] + minimalRectSize;
     }
 
-    if (Math.abs(start[1] - end[1]) < this.minimalRectSize) {
-      end[1] = start[1] + this.minimalRectSize;
+    if (Math.abs(start[1] - end[1]) < minimalRectSize) {
+      end[1] = start[1] + minimalRectSize;
     }
 
     return {
@@ -212,18 +197,20 @@ class Segmentation extends React.Component {
 
     const frameBoundingRect = this.svgRef.current.getBoundingClientRect();
     const { rects } = this.state;
+    const coeff = this.getScaleCoefficient();
+
     this.setState({
       isCreatingNew: true,
       rects: [
         ...rects,
         {
           start: [
-            e.clientX - frameBoundingRect.x,
-            e.clientY - frameBoundingRect.y
+            (e.clientX - frameBoundingRect.x) / coeff,
+            (e.clientY - frameBoundingRect.y) / coeff
           ],
           end: [
-            e.clientX - frameBoundingRect.x,
-            e.clientY - frameBoundingRect.y
+            (e.clientX - frameBoundingRect.x) / coeff,
+            (e.clientY - frameBoundingRect.y) / coeff
           ],
           isNew: true,
           id: guid()
@@ -233,18 +220,17 @@ class Segmentation extends React.Component {
   };
 
   handleDelete = id => {
-    this.setState({
-      rects: this.state.rects.filter(rect => rect.id !== id)
-    });
+    this.setState(
+      {
+        rects: this.state.rects.filter(rect => rect.id !== id)
+      },
+      () => this.onChange()
+    );
   };
 
-  handleMouseLeave = () => {
-    this.setState({ isMouseHover: false });
-  };
+  handleMouseLeave = () => this.setState({ isMouseHover: false });
 
-  handleMouseEnter = () => {
-    this.setState({ isMouseHover: true });
-  };
+  handleMouseEnter = () => this.setState({ isMouseHover: true });
 
   handleChange = (x, y, endX, endY, id) => {
     const coeff = this.getScaleCoefficient();
@@ -257,16 +243,20 @@ class Segmentation extends React.Component {
 
     const { rects } = this.state;
     const foundBox = rects.find(box => box.id === id);
-    const { width, height } = this.svgRef.current.getBoundingClientRect();
+    let { width, height } = this.svgRef.current.getBoundingClientRect();
 
+    width = width / coeff;
+    height = height / coeff;
     let start = [x, y];
     let end = [endX, endY];
 
+    // checking svg borders on the y-axis
     if (y <= 0 || endY >= height) {
       start = [x, foundBox.start[1]];
       end = [endX, foundBox.end[1]];
     }
 
+    // checking svg borders on the x-axis
     if (x < 0 || endX > width) {
       start = [foundBox.start[0], y];
       end = [foundBox.end[0], endY];
@@ -289,5 +279,3 @@ class Segmentation extends React.Component {
 }
 
 export default Segmentation;
-
-//   ReactDOM.render(<Segmentation />, document.querySelector("#app"))
