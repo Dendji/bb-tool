@@ -5,15 +5,13 @@ import { BoundingBox } from '../BoundingBox/BoundingBox';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 
-const minimalRectSize = 50;
+const minimumRectSize = 50;
 
 class Segmentation extends React.Component {
   static propTypes = {
     onChange: PropTypes.func.isRequired,
     imageUrl: PropTypes.string.isRequired
   };
-
-  // using when width or height are less than this
 
   constructor(props) {
     super(props);
@@ -32,23 +30,6 @@ class Segmentation extends React.Component {
       isCreatingNew: false
     };
   }
-
-  formatCoordinates = rects => {
-    // SVG origin (0,0 point) of coordinate system is top left corner
-    // but we need origin at bottom left corner, so we need reverse Y coordinate
-    const maxY = this.svgRef.current.getBoundingClientRect().height;
-    return rects.map(rect => {
-      const { start, end } = rect;
-      return [[start[0], maxY - start[1]], [end[0], maxY - end[1]]];
-    });
-  };
-
-  onChange = () => {
-    const { onChange } = this.props;
-    const { rects } = this.state;
-    const formatted = this.formatCoordinates(rects);
-    onChange(formatted);
-  };
 
   componentDidMount() {
     var img = new Image();
@@ -72,6 +53,23 @@ class Segmentation extends React.Component {
     document.body.removeEventListener('mousedown', this.startBoundingBox);
     window.removeEventListener('resize', _.throttle(this.handleResize, 500));
   }
+
+  formatCoordinates = rects => {
+    // SVG origin (0,0 point) of coordinate system is top left corner
+    // but we need origin at bottom left corner, so we need reverse Y coordinate
+    const maxY = this.svgRef.current.getBoundingClientRect().height;
+    return rects.map(rect => {
+      const { start, end } = rect;
+      return [[start[0], maxY - start[1]], [end[0], maxY - end[1]]];
+    });
+  };
+
+  onChange = () => {
+    const { onChange } = this.props;
+    const { rects } = this.state;
+    const formatted = this.formatCoordinates(rects);
+    onChange(formatted);
+  };
 
   handleResize = e => {
     const currentWidth = this.svgRef.current.getBoundingClientRect().width;
@@ -137,7 +135,7 @@ class Segmentation extends React.Component {
     document.removeEventListener('mousemove', this.handleMouseMove);
 
     const { rects } = this.state;
-    const newRect = this.setRectMinimalSize(rects.find(rect => rect.isNew));
+    const newRect = this.setRectMinimumSize(rects.find(rect => rect.isNew));
 
     this.setState(
       {
@@ -154,15 +152,15 @@ class Segmentation extends React.Component {
     );
   };
 
-  setRectMinimalSize = rect => {
+  setRectMinimumSize = rect => {
     const { start, end } = rect;
 
-    if (Math.abs(start[0] - end[0]) < minimalRectSize) {
-      end[0] = start[0] + minimalRectSize;
+    if (Math.abs(start[0] - end[0]) < minimumRectSize) {
+      end[0] = start[0] + minimumRectSize;
     }
 
-    if (Math.abs(start[1] - end[1]) < minimalRectSize) {
-      end[1] = start[1] + minimalRectSize;
+    if (Math.abs(start[1] - end[1]) < minimumRectSize) {
+      end[1] = start[1] + minimumRectSize;
     }
 
     return {
@@ -175,7 +173,7 @@ class Segmentation extends React.Component {
   handleMouseMove = e => {
     if (this.state.isCreatingNew && this.state.isMouseHover) {
       const { movementX, movementY } = e;
-
+      const coeff = this.getScaleCoefficient();
       const { rects } = this.state;
       const newRect = rects.find(rect => rect.isNew);
 
@@ -184,7 +182,10 @@ class Segmentation extends React.Component {
           ...rects.filter(rect => !rect.isNew),
           {
             ...newRect,
-            end: [newRect.end[0] + movementX, newRect.end[1] + movementY]
+            end: [
+              newRect.end[0] + movementX / coeff,
+              newRect.end[1] + movementY / coeff
+            ]
           }
         ]
       });
