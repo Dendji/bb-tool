@@ -1,6 +1,5 @@
 import React from 'react';
 import guid from 'uniqid';
-import './Segmentation.css';
 import { BoundingBox } from '../BoundingBox/BoundingBox';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
