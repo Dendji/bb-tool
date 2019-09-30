@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/Dendji/bb-tool/static/css/main.7eafed85.chunk.css",
-    "main.js": "/Dendji/bb-tool/static/js/main.0b783536.chunk.js",
-    "main.js.map": "/Dendji/bb-tool/static/js/main.0b783536.chunk.js.map",
-    "runtime~main.js": "/Dendji/bb-tool/static/js/runtime~main.a49eab98.js",
-    "runtime~main.js.map": "/Dendji/bb-tool/static/js/runtime~main.a49eab98.js.map",
-    "static/js/2.8ec4719e.chunk.js": "/Dendji/bb-tool/static/js/2.8ec4719e.chunk.js",
-    "static/js/2.8ec4719e.chunk.js.map": "/Dendji/bb-tool/static/js/2.8ec4719e.chunk.js.map",
-    "index.html": "/Dendji/bb-tool/index.html",
-    "precache-manifest.4222a3458f995cf576b431a77cfb195e.js": "/Dendji/bb-tool/precache-manifest.4222a3458f995cf576b431a77cfb195e.js",
-    "service-worker.js": "/Dendji/bb-tool/service-worker.js",
-    "static/css/main.7eafed85.chunk.css.map": "/Dendji/bb-tool/static/css/main.7eafed85.chunk.css.map"
+    "main.css": "/bb-tool/static/css/main.7eafed85.chunk.css",
+    "main.js": "/bb-tool/static/js/main.0b783536.chunk.js",
+    "main.js.map": "/bb-tool/static/js/main.0b783536.chunk.js.map",
+    "runtime~main.js": "/bb-tool/static/js/runtime~main.47ff0f66.js",
+    "runtime~main.js.map": "/bb-tool/static/js/runtime~main.47ff0f66.js.map",
+    "static/js/2.8ec4719e.chunk.js": "/bb-tool/static/js/2.8ec4719e.chunk.js",
+    "static/js/2.8ec4719e.chunk.js.map": "/bb-tool/static/js/2.8ec4719e.chunk.js.map",
+    "index.html": "/bb-tool/index.html",
+    "precache-manifest.7af46857de1eef69c4744555c503d36c.js": "/bb-tool/precache-manifest.7af46857de1eef69c4744555c503d36c.js",
+    "service-worker.js": "/bb-tool/service-worker.js",
+    "static/css/main.7eafed85.chunk.css.map": "/bb-tool/static/css/main.7eafed85.chunk.css.map"
   }
 }
